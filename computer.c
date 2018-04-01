@@ -643,6 +643,7 @@ int Mem( DecodedInstr* d, int val, int *changedMem) {
                 break;
             case 43:    //sw
                 mips.memory[1024 + rs + imm] = mips.registers[rt];
+				printf("Should be 100: %d\n", mips.registers[rt]);
                 *changedMem = 0x00401000 + rs + imm;
                 return 0x00401000 + rs + imm;
                 break;
