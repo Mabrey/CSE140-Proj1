@@ -639,12 +639,12 @@ int Mem( DecodedInstr* d, int val, int *changedMem) {
             case 35:    //lw
                 d -> regs.i.rt = mips.memory[1024 + rs + imm];
                 *changedMem = -1;
-                return rs + imm;
+                return 0x00401000 + rs + imm;
                 break;
             case 43:    //sw
                 mips.memory[1024 + rs + imm] = mips.registers[rt];
                 *changedMem = 0x00401000 + rs + imm;
-                return rs + imm;
+                return 0x00401000 + rs + imm;
                 break;
             default:
                 return -1;
