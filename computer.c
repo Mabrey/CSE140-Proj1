@@ -266,6 +266,7 @@ void Decode ( unsigned int instr, DecodedInstr* d, RegVals* rVals) {
 
                 case 9:
                 case 35:
+					printf("Register: %d\n", d->regs.i.rt);
                 case 43:
                     signedImmediate = instr << 16;        //sets immediate for sign extended immediates
                     signedImmediate = signedImmediate >> 16;
@@ -532,6 +533,7 @@ int ExecuteIFormat(DecodedInstr* d, RegVals* rVals) {
 	case 35:		//lw
 		rVals->R_rt = rVals->R_rs + imm;
 		val = rVals->R_rt;
+		printf("Register execute: %d\n", d->regs.i.rt);
 		break;
 	case 43:		//sw
 		val = rVals->R_rs + imm;
@@ -604,6 +606,7 @@ void UpdatePC ( DecodedInstr* d, int val) {
  */
 int Mem( DecodedInstr* d, int val, int *changedMem) {
     //printf("val in mem = %08x\n", val);
+	printf("Register Mem: %d\n", d->regs.i.rt);
     if (d -> op != 35 && d -> op != 43)
     {
         *changedMem = -1;
@@ -637,9 +640,12 @@ int Mem( DecodedInstr* d, int val, int *changedMem) {
             */
 			switch (op) {
             case 35:    //lw
-                d -> regs.i.rt = mips.memory[1024 + rs + imm];
+				//need to output ?
+				val = mips.memory[1024 + rs + imm];
+               // d -> regs.i.rt = mips.memory[1024 + rs + imm];
                 *changedMem = -1;
-                return 0x00401000 + rs + imm;
+				return val;
+                //return 0x00401000 + rs + imm;
                 break;
             case 43:    //sw
                 mips.memory[1024 + rs + imm] = mips.registers[rt];
@@ -663,7 +669,7 @@ int Mem( DecodedInstr* d, int val, int *changedMem) {
  * otherwise put -1 in *changedReg.
  */
 void RegWrite( DecodedInstr* d, int val, int *changedReg) {
-    
+	printf("Register Write: %d\n", d->regs.i.rt);
     //printf("val in regwrite = %08x\n", val);
     if (d->type == I) {            //I Format
 
