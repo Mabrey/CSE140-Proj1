@@ -155,7 +155,7 @@ void PrintInfo(int changedReg, int changedMem) {
 	printf("New pc = %8.8x\n", mips.pc);
 	if (!mips.printingRegisters && changedReg == -1)
 	{
-		printf("No register was updated possibly.\n");
+		printf("No register was updated\n");
 		printf("Reg print over.\n");
 	}
 	else if (!mips.printingRegisters)
@@ -173,7 +173,7 @@ void PrintInfo(int changedReg, int changedMem) {
 		}
 	}
 
-	printf("check mem update.\n");
+	//printf("check mem update.\n");
 	if (!mips.printingMemory && changedMem == -1) {
 		printf("No memory location was updated.\n");
 	}
@@ -199,6 +199,7 @@ void PrintInfo(int changedReg, int changedMem) {
  *  instruction fetch. 
  */
 unsigned int Fetch ( int addr) {
+	//printf("Fetch Address: \t0x%x\n", addr);
     return mips.memory[(addr-0x00400000)/4];
 }
 
@@ -266,12 +267,12 @@ void Decode ( unsigned int instr, DecodedInstr* d, RegVals* rVals) {
 
                 case 9:
                 case 35:
-					printf("Register: %d\n", d->regs.i.rt);
+					//printf("Register: %d\n", d->regs.i.rt);
                 case 43:
                     signedImmediate = instr << 16;        //sets immediate for sign extended immediates
                     signedImmediate = signedImmediate >> 16;
                     d -> regs.i.addr_or_immed = signedImmediate;
-					printf("Immediate: 0x%08x\n", signedImmediate);
+					//printf("Immediate: 0x%08x\n", signedImmediate);
                     break;
 
                 case 15:
@@ -606,7 +607,7 @@ void UpdatePC ( DecodedInstr* d, int val) {
  */
 int Mem( DecodedInstr* d, int val, int *changedMem) {
     //printf("val in mem = %08x\n", val);
-	printf("Register Mem: %d\n", d->regs.i.rt);
+	//printf("Register Mem: %d\n", d->regs.i.rt);
     if (d -> op != 35 && d -> op != 43)
     {
         *changedMem = -1;
@@ -616,13 +617,13 @@ int Mem( DecodedInstr* d, int val, int *changedMem) {
     {
 		int newAddr = 4198400 + mips.registers[d->regs.i.rs] + d->regs.i.addr_or_immed * 4;
 		//int newAddr = d->regs.i.rs + (val) * 4;
-		printf("New Addr: 0x%08x\n", newAddr);
+		//printf("New Addr: 0x%08x\n", newAddr);
         if (newAddr % 4 != 0        //not word aligned
             || newAddr < 4198400    //below memory available
             || newAddr > 4210687)   //above memory available
         
         {
-			printf("Memory Access Exception at 0x%08x: address 0x%08x\n", mips.pc, newAddr);
+			//printf("Memory Access Exception at 0x%08x: address 0x%08x\n", mips.pc, newAddr);
             //printf("Memory Access Exception at 0x%08x: address 0x%08x\n", mips.pc, d -> regs.i.addr_or_immed );
             exit(0);
         }
@@ -632,7 +633,7 @@ int Mem( DecodedInstr* d, int val, int *changedMem) {
             int op = d->op;
 			int imm = (d->regs.i.addr_or_immed) * 4;
 			int rs = mips.registers[d->regs.i.rs];
-			printf("rs: 0x%08x\n", rs);
+			//printf("rs: 0x%08x\n", rs);
             int rt = mips.registers[d->regs.i.rt];
 			/*
 			int rs = d->regs.i.rs;
@@ -647,9 +648,10 @@ int Mem( DecodedInstr* d, int val, int *changedMem) {
 				return val;
                 //return 0x00401000 + rs + imm;
                 break;
-            case 43:    //sw
-                mips.memory[1024 + rs + imm] = mips.registers[rt];
-				printf("Should be 100: %d\n", mips.registers[rt]);
+            case 43:    //sw	M[rs + imm] = rt
+                mips.memory[1024 + (rs + imm)/4] = rt;
+				//printf("RT's val: %d\n", mips.memory[1024 + rs + imm]);
+				//printf("Should be 100: %d\n", mips.memory[1024 + rs + imm]);
                 *changedMem = 0x00401000 + rs + imm;
                 return 0x00401000 + rs + imm;
                 break;
@@ -669,7 +671,7 @@ int Mem( DecodedInstr* d, int val, int *changedMem) {
  * otherwise put -1 in *changedReg.
  */
 void RegWrite( DecodedInstr* d, int val, int *changedReg) {
-	printf("Register Write: %d\n", d->regs.i.rt);
+	//printf("Register Write: %d\n", d->regs.i.rt);
     //printf("val in regwrite = %08x\n", val);
     if (d->type == I) {            //I Format
 
